@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+
+  conjur:
+    image: registry.tld/conjur-appliance:4.9.11.0
+    privileged: true
+    ports:
+      - '443:443'  # Conjur API and web UI
+    volumes:
+      - .:/src
+    working_dir: /src
+
+  jenkins_without_conjur:
+    image: jenkins:2.60.1
+    ports:
+      - '8080:8080'    # Jenkins API and web UI
+    volumes:
+      - ./jenkins_without_conjur:/var/jenkins_home
+      - .:/src
+
+  jenkins_with_conjur:
+    build: .
+    image: jenkins:2.60.1-conjur  # LTS release
+    ports:
+      - '8081:8080'    # Jenkins API and web UI
+    volumes:
+      - ./jenkins_with_conjur:/var/jenkins_home
+      - .:/src
